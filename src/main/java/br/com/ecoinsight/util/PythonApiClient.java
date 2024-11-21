@@ -1,6 +1,6 @@
 package br.com.ecoinsight.util;
 
-import br.com.ecoinsight.model.Diagnostic;
+import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.model.Projeto;
 
 import javax.ws.rs.client.Client;
@@ -25,25 +25,25 @@ public class PythonApiClient {
         return response.readEntity(String.class);
     }
 
-    public static Diagnostic calculateSustainability(Projeto projeto, String llmAnalysis) throws Exception {
+    public static Diagnostico calculateSustainability(Projeto projeto, String llmAnalysis) throws Exception {
         Client client = ClientBuilder.newClient();
         Response response = client.target(PYTHON_API_BASE_URL + "/calculate_sustainability")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new DiagnosticPayload(projeto, llmAnalysis)));
+                .post(Entity.json(new DiagnosticarPayload(projeto, llmAnalysis)));
 
         if (response.getStatus() != 200) {
             throw new Exception("Erro ao calcular sustentabilidade.");
         }
 
-        return response.readEntity(Diagnostic.class);
+        return response.readEntity(Diagnostico.class);
     }
 
-    private static class DiagnosticPayload {
-        public Projeto project;
+    private static class DiagnosticarPayload {
+        public Projeto projeto;
         public String llmResponse;
 
-        DiagnosticPayload(Projeto project, String llmResponse) {
-            this.project = project;
+        DiagnosticarPayload(Projeto projeto, String llmResponse) {
+            this.projeto = projeto;
             this.llmResponse = llmResponse;
         }
     }

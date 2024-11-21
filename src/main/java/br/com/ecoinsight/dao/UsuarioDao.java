@@ -23,7 +23,7 @@ class UsuarioDao implements IUsuarioDao { // Package-private
     public boolean cadastrarUsuario(Usuario usuario) throws Exception {
         String sql = "INSERT INTO " + tabela + " (nome, email, senha) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, usuario.getName());
+            stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
             stmt.setString(3, usuario.getSenha());
             return stmt.executeUpdate() > 0;
@@ -38,7 +38,7 @@ class UsuarioDao implements IUsuarioDao { // Package-private
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Usuario(
-                        rs.getInt("id"), // Adiciona o ID do usuário
+                        rs.getInt("id"),
                         rs.getString("nome"),
                         rs.getString("email"),
                         rs.getString("senha")
@@ -48,7 +48,6 @@ class UsuarioDao implements IUsuarioDao { // Package-private
         return null;
     }
 
-    //Salvar token de redefinição de senha
     public boolean salvarTokenRedefinicao(String email, String token) throws Exception {
         String sql = "UPDATE " + tabela + " SET reset_token = ?, token_expiration = SYSDATE + INTERVAL '1' HOUR WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

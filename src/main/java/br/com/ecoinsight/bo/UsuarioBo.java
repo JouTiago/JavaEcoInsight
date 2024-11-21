@@ -4,7 +4,7 @@ import br.com.ecoinsight.dao.IUsuarioDao;
 import br.com.ecoinsight.model.Usuario;
 import br.com.ecoinsight.util.JWTUtil;
 
-class UsuarioBo implements IUsuarioBo { // Package-private
+class UsuarioBo implements IUsuarioBo {
     private final IUsuarioDao usuarioDao;
 
     UsuarioBo(IUsuarioDao usuarioDao) {
@@ -15,7 +15,7 @@ class UsuarioBo implements IUsuarioBo { // Package-private
     public boolean solicitarAlteracaoSenha(String email) throws Exception {
         Usuario usuario = usuarioDao.pesquisarUsuarioPorEmail(email);
         if (usuario != null) {
-            String resetToken = JWTUtil.gerarToken(usuario.getId(), usuario.getEmail()); // Passa o userId e o email
+            String resetToken = JWTUtil.gerarToken(usuario.getId(), usuario.getEmail());
             boolean tokenSalvo = usuarioDao.salvarTokenRedefinicao(email, resetToken);
             if (tokenSalvo) {
                 System.out.println("Link de redefinição: /reset-password?token=" + resetToken);
@@ -40,7 +40,7 @@ class UsuarioBo implements IUsuarioBo { // Package-private
     public String login(String email, String senha) throws Exception {
         Usuario usuario = usuarioDao.pesquisarUsuarioPorEmail(email);
         if (usuario != null && usuario.getSenha().equals(senha)) {
-            return JWTUtil.gerarToken(usuario.getId(), usuario.getEmail()); // Passa o userId e o email
+            return JWTUtil.gerarToken(usuario.getId(), usuario.getEmail());
         }
         throw new Exception("Credenciais inválidas.");
     }

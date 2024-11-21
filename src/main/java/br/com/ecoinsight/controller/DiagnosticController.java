@@ -2,7 +2,7 @@ package br.com.ecoinsight.controller;
 
 import br.com.ecoinsight.bo.IDiagnosticBo;
 import br.com.ecoinsight.bo.DiagnosticBoFactory;
-import br.com.ecoinsight.model.Diagnostic;
+import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.model.Projeto;
 
 import javax.ws.rs.*;
@@ -18,8 +18,8 @@ public class DiagnosticController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response iniciarDiagnostico(@PathParam("projectId") int projectId, Projeto projeto) {
         try {
-            Diagnostic diagnostic = diagnosticBo.iniciarDiagnostico(projectId, projeto);
-            return Response.ok(diagnostic).build();
+            Diagnostico diagnostico = diagnosticBo.iniciarDiagnostico(projectId, projeto);
+            return Response.ok(diagnostico).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }
@@ -29,11 +29,11 @@ public class DiagnosticController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response obterDiagnostico(@PathParam("projectId") int projectId) {
         try {
-            Diagnostic diagnostic = diagnosticBo.obterDiagnostico(projectId);
-            if (diagnostic == null) {
+            Diagnostico diagnostico = diagnosticBo.obterDiagnostico(projectId);
+            if (diagnostico == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("{\"error\": \"Diagnóstico não encontrado.\"}").build();
             }
-            return Response.ok(diagnostic).build();
+            return Response.ok(diagnostico).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"" + e.getMessage() + "\"}").build();
         }

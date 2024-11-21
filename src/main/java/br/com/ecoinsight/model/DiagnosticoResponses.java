@@ -1,12 +1,12 @@
 package br.com.ecoinsight.model;
 
-public class DiagnosticResponses {
+public class DiagnosticoResponses {
     private int environmentalImpactKnowledge;
     private int environmentalPolicies;
     private int performanceMeasures;
     private int riskAssessment;
 
-    public DiagnosticResponses(int environmentalImpactKnowledge, int environmentalPolicies, int performanceMeasures, int riskAssessment) {
+    public DiagnosticoResponses(int environmentalImpactKnowledge, int environmentalPolicies, int performanceMeasures, int riskAssessment) {
         this.environmentalImpactKnowledge = environmentalImpactKnowledge;
         this.environmentalPolicies = environmentalPolicies;
         this.performanceMeasures = performanceMeasures;

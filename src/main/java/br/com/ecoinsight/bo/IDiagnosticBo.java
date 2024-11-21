@@ -1,9 +1,11 @@
 package br.com.ecoinsight.bo;
 
-import br.com.ecoinsight.model.Diagnostic;
+import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.model.Projeto;
+import org.glassfish.jersey.spi.Contract;
 
+@Contract
 public interface IDiagnosticBo {
-    Diagnostic iniciarDiagnostico(int projectId, Projeto projeto) throws Exception;
-    Diagnostic obterDiagnostico(int projectId) throws Exception;
+    Diagnostico iniciarDiagnostico(int projectId, Projeto projeto) throws Exception;
+    Diagnostico obterDiagnostico(int projectId) throws Exception;
 }

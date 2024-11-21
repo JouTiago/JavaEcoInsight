@@ -1,8 +1,10 @@
 package br.com.ecoinsight.dao;
 
-import br.com.ecoinsight.model.Diagnostic;
+import br.com.ecoinsight.model.Diagnostico;
+import org.glassfish.jersey.spi.Contract;
 
+@Contract
 public interface IDiagnosticDao {
-    void saveDiagnostic(Diagnostic diagnostic) throws Exception;
-    Diagnostic getDiagnosticByProjectId(int projectId) throws Exception;
+    void saveDiagnostic(Diagnostico diagnostico) throws Exception;
+    Diagnostico getDiagnosticByProjectId(int projectId) throws Exception;
 }

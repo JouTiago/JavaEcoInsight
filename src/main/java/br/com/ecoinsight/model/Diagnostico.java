@@ -1,12 +1,12 @@
 package br.com.ecoinsight.model;
 
-public class Diagnostic {
+public class Diagnostico {
     private int projectId;
     private String llmAnalysis;
     private double sustainabilityScore;
     private String llmJustification;
 
-    public Diagnostic(int projectId, String llmAnalysis, double sustainabilityScore, String llmJustification) {
+    public Diagnostico(int projectId, String llmAnalysis, double sustainabilityScore, String llmJustification) {
         this.projectId = projectId;
         this.llmAnalysis = llmAnalysis;
         this.sustainabilityScore = sustainabilityScore;
