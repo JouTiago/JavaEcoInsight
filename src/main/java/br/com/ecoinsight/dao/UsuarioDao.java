@@ -32,12 +32,17 @@ class UsuarioDao implements IUsuarioDao { // Package-private
 
     @Override
     public Usuario pesquisarUsuarioPorEmail(String email) throws Exception {
-        String sql = "SELECT nome, email, senha FROM " + tabela + " WHERE email = ?";
+        String sql = "SELECT id, nome, email, senha FROM " + tabela + " WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Usuario(rs.getString("nome"), rs.getString("email"), rs.getString("senha"));
+                return new Usuario(
+                        rs.getInt("id"), // Adiciona o ID do usuário
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("senha")
+                );
             }
         }
         return null;

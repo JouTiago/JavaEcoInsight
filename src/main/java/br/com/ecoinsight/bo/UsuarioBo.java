@@ -15,7 +15,7 @@ class UsuarioBo implements IUsuarioBo { // Package-private
     public boolean solicitarAlteracaoSenha(String email) throws Exception {
         Usuario usuario = usuarioDao.pesquisarUsuarioPorEmail(email);
         if (usuario != null) {
-            String resetToken = JWTUtil.gerarToken(email);
+            String resetToken = JWTUtil.gerarToken(usuario.getId(), usuario.getEmail()); // Passa o userId e o email
             boolean tokenSalvo = usuarioDao.salvarTokenRedefinicao(email, resetToken);
             if (tokenSalvo) {
                 System.out.println("Link de redefinição: /reset-password?token=" + resetToken);
@@ -24,6 +24,7 @@ class UsuarioBo implements IUsuarioBo { // Package-private
         }
         throw new Exception("Usuário não encontrado.");
     }
+
 
     @Override
     public boolean alterarSenha(String token, String novaSenha) throws Exception {
@@ -39,7 +40,7 @@ class UsuarioBo implements IUsuarioBo { // Package-private
     public String login(String email, String senha) throws Exception {
         Usuario usuario = usuarioDao.pesquisarUsuarioPorEmail(email);
         if (usuario != null && usuario.getSenha().equals(senha)) {
-            return JWTUtil.gerarToken(usuario.getEmail());
+            return JWTUtil.gerarToken(usuario.getId(), usuario.getEmail()); // Passa o userId e o email
         }
         throw new Exception("Credenciais inválidas.");
     }

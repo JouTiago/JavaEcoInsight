@@ -1,16 +1,25 @@
 package br.com.ecoinsight.model;
 
 public class Usuario {
+    private int id;
     private String name;
     private String email;
     private String senha;
 
     public Usuario() {}
 
-    public Usuario(String name, String email, String senha) {
+    public Usuario(int id, String name, String email, String senha) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.senha = senha;
+    }
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() { return name; }
