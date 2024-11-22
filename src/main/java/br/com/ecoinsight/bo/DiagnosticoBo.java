@@ -1,14 +1,14 @@
 package br.com.ecoinsight.bo;
 
-import br.com.ecoinsight.dao.IDiagnosticDao;
+import br.com.ecoinsight.dao.IDiagnosticoDao;
 import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.model.Projeto;
 import br.com.ecoinsight.util.PythonApiClient;
 
 class DiagnosticBo implements IDiagnosticBo {
-    private final IDiagnosticDao diagnosticDao;
+    private final IDiagnosticoDao diagnosticDao;
 
-    DiagnosticBo(IDiagnosticDao diagnosticDao) {
+    DiagnosticBo(IDiagnosticoDao diagnosticDao) {
         this.diagnosticDao = diagnosticDao;
     }
 
