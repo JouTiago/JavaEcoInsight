@@ -2,6 +2,8 @@ package br.com.ecoinsight.controller;
 
 import br.com.ecoinsight.bo.IUsuarioBo;
 import br.com.ecoinsight.bo.UsuarioBoFactory;
+import br.com.ecoinsight.exception.ValidationException;
+import br.com.ecoinsight.exception.UnauthorizedException;
 import br.com.ecoinsight.model.Usuario;
 
 import javax.ws.rs.*;
@@ -22,8 +24,18 @@ public class UsuarioController {
         try {
             String token = usuarioBo.login(credentials.get("email"), credentials.get("password"));
             return Response.ok(Map.of("token", token)).build();
+        } catch (UnauthorizedException e) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        } catch (ValidationException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(Map.of("error", e.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Erro inesperado ao realizar login."))
+                    .build();
         }
     }
 
@@ -34,9 +46,17 @@ public class UsuarioController {
     public Response register(Usuario usuario) {
         try {
             usuarioBo.cadastrar(usuario);
-            return Response.ok(Map.of("message", "Usuário registrado com sucesso!")).build();
+            return Response.status(Response.Status.CREATED)
+                    .entity(Map.of("message", "Usuário registrado com sucesso!"))
+                    .build();
+        } catch (ValidationException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("error", e.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Erro inesperado ao registrar usuário."))
+                    .build();
         }
     }
 
@@ -48,8 +68,14 @@ public class UsuarioController {
         try {
             usuarioBo.solicitarAlteracaoSenha(payload.get("email"));
             return Response.ok(Map.of("message", "Link de redefinição enviado!")).build();
+        } catch (ValidationException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("error", e.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Erro inesperado ao solicitar redefinição de senha."))
+                    .build();
         }
     }
 
@@ -61,8 +87,18 @@ public class UsuarioController {
         try {
             usuarioBo.alterarSenha(payload.get("token"), payload.get("newPassword"));
             return Response.ok(Map.of("message", "Senha redefinida com sucesso!")).build();
+        } catch (ValidationException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        } catch (UnauthorizedException e) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("error", e.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Erro inesperado ao redefinir senha."))
+                    .build();
         }
     }
 }

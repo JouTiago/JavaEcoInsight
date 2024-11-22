@@ -1,5 +1,6 @@
 package br.com.ecoinsight.util;
 
+import br.com.ecoinsight.exception.InternalServerErrorException;
 import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.model.Projeto;
 
@@ -10,32 +11,36 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class PythonApiClient {
-    private static final String PYTHON_API_BASE_URL = "http://python-api:5000";
+    private static final String PYTHON_API_BASE_URL = "http://127.0.0.1:5000";
 
-    public static String classifyProject(Projeto projeto) throws Exception {
+    public static String classifyProject(Projeto projeto) {
         Client client = ClientBuilder.newClient();
-        Response response = client.target(PYTHON_API_BASE_URL + "/classify_project")
+        try (Response response = client.target(PYTHON_API_BASE_URL + "/classify_project")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(projeto));
+                .post(Entity.json(projeto))) {
 
-        if (response.getStatus() != 200) {
-            throw new Exception("Erro ao classificar projeto.");
+            if (response.getStatus() != 200) {
+                throw new InternalServerErrorException("Erro ao classificar projeto. Código de status: "
+                        + response.getStatus());
+            }
+
+            return response.readEntity(String.class);
         }
-
-        return response.readEntity(String.class);
     }
 
-    public static Diagnostico calculateSustainability(Projeto projeto, String llmAnalysis) throws Exception {
+    public static Diagnostico calculateSustainability(Projeto projeto, String llmAnalysis) {
         Client client = ClientBuilder.newClient();
-        Response response = client.target(PYTHON_API_BASE_URL + "/calculate_sustainability")
+        try (Response response = client.target(PYTHON_API_BASE_URL + "/calculate_sustainability")
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(new DiagnosticarPayload(projeto, llmAnalysis)));
+                .post(Entity.json(new DiagnosticarPayload(projeto, llmAnalysis)))) {
 
-        if (response.getStatus() != 200) {
-            throw new Exception("Erro ao calcular sustentabilidade.");
+            if (response.getStatus() != 200) {
+                throw new InternalServerErrorException("Erro ao calcular sustentabilidade. Código de status: "
+                        + response.getStatus());
+            }
+
+            return response.readEntity(Diagnostico.class);
         }
-
-        return response.readEntity(Diagnostico.class);
     }
 
     private static class DiagnosticarPayload {

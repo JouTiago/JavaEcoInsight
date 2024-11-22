@@ -7,10 +7,10 @@ public class Diagnostico {
     private String llmJustification;
 
     public Diagnostico(int projectId, String llmAnalysis, double sustainabilityScore, String llmJustification) {
-        this.projectId = projectId;
-        this.llmAnalysis = llmAnalysis;
-        this.sustainabilityScore = sustainabilityScore;
-        this.llmJustification = llmJustification;
+        this.setProjectId(projectId);
+        this.setLlmAnalysis(llmAnalysis);
+        this.setSustainabilityScore(sustainabilityScore);
+        this.setLlmJustification(llmJustification);
     }
 
     public int getProjectId() {

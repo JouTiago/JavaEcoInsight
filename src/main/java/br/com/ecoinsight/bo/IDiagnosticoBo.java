@@ -5,7 +5,7 @@ import br.com.ecoinsight.model.Projeto;
 import org.glassfish.jersey.spi.Contract;
 
 @Contract
-public interface IDiagnosticBo {
-    Diagnostico iniciarDiagnostico(int projectId, Projeto projeto) throws Exception;
-    Diagnostico obterDiagnostico(int projectId) throws Exception;
+public interface IDiagnosticoBo {
+    Diagnostico iniciarDiagnostico(int projectId, Projeto projeto);
+    Diagnostico obterDiagnostico(int projectId);
 }

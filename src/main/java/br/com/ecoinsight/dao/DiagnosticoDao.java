@@ -1,26 +1,24 @@
 package br.com.ecoinsight.dao;
 
+import br.com.ecoinsight.exception.DatabaseException;
 import br.com.ecoinsight.model.Diagnostico;
 import br.com.ecoinsight.util.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-class DiagnosticDao implements IDiagnosticDao {
+class DiagnosticoDao implements IDiagnosticoDao {
     private final Connection connection;
     String tabela = "T_DIAGNOSTICO";
 
-    DiagnosticDao() {
-        try {
-            this.connection = ConnectionFactory.realizarConexao().getConnection();
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao conectar ao banco de dados.", e);
-        }
+    DiagnosticoDao() {
+        this.connection = ConnectionFactory.realizarConexao().getConnection();
     }
 
     @Override
-    public void saveDiagnostic(Diagnostico diagnostico) throws Exception {
+    public void saveDiagnostic(Diagnostico diagnostico) {
         String sql = "INSERT INTO " + tabela + " (project_id, llm_analysis, sustainability_score, llm_justification) " +
                 "VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -29,11 +27,13 @@ class DiagnosticDao implements IDiagnosticDao {
             stmt.setDouble(3, diagnostico.getSustainabilityScore());
             stmt.setString(4, diagnostico.getLlmJustification());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao salvar o diagnóstico no banco de dados.", e);
         }
     }
 
     @Override
-    public Diagnostico getDiagnosticByProjectId(int projectId) throws Exception {
+    public Diagnostico getDiagnosticByProjectId(int projectId) {
         String sql = "SELECT * FROM " + tabela + " WHERE project_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, projectId);
@@ -46,6 +46,8 @@ class DiagnosticDao implements IDiagnosticDao {
                         rs.getString("llm_justification")
                 );
             }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao recuperar o diagnóstico para o ID" + projectId, e);
         }
         return null;
     }
