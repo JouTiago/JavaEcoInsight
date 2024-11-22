@@ -7,6 +7,6 @@ import org.glassfish.jersey.spi.Contract;
 public interface IUsuarioBo {
     String login(String email, String senha);
     void cadastrar(Usuario usuario);
-    void solicitarAlteracaoSenha(String email);
+    String solicitarAlteracaoSenha(String email);
     void alterarSenha(String token, String novaSenha);
 }

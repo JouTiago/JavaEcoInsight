@@ -3,6 +3,7 @@ package br.com.ecoinsight.controller;
 import br.com.ecoinsight.bo.IProjetoBo;
 import br.com.ecoinsight.bo.ProjetoBoFactory;
 import br.com.ecoinsight.exception.*;
+import br.com.ecoinsight.model.DiagnosticoResponses;
 import br.com.ecoinsight.model.Projeto;
 import br.com.ecoinsight.util.JWTUtil;
 
@@ -12,32 +13,65 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-@Path("/api/projects")
+@Path("/projects")
 public class ProjetoController {
     private final IProjetoBo projetoBo = ProjetoBoFactory.criarProjetoBo();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cadastrarProjeto(@HeaderParam("Authorization") String token, Projeto projeto) {
+    public Response criarProjeto(Map<String, Object> payload) {
         try {
-            int userId = JWTUtil.extrairUserId(token);
-            int projectId = projetoBo.cadastrarProjeto(projeto, userId);
+            String token = (String) payload.get("token");
+            if (token == null || token.isEmpty()) {
+                throw new ValidationException("Token JWT é obrigatório.");
+            }
+
+            int userId;
+            try {
+                userId = JWTUtil.extrairUserId(token);
+            } catch (UnauthorizedException e) {
+                throw new ValidationException("Token JWT inválido ou expirado.");
+            }
+
+            Map<String, Object> projectData = (Map<String, Object>) payload.get("project");
+            if (projectData == null) {
+                throw new ValidationException("Os dados do projeto são obrigatórios.");
+            }
+
+            String description = (String) projectData.get("description");
+            String location = (String) projectData.get("location");
+            int estimatedBudget = ((Number) projectData.get("estimatedBudget")).intValue();
+            List<String> plannedEnergyTypes = (List<String>) projectData.get("plannedEnergyTypes");
+
+            Map<String, Integer> diagnosticResponses = (Map<String, Integer>) projectData.get("diagnosticResponses");
+            if (diagnosticResponses == null) {
+                throw new ValidationException("As respostas de diagnóstico são obrigatórias.");
+            }
+
+            DiagnosticoResponses diagnosticoResponses = new DiagnosticoResponses(
+                    diagnosticResponses.get("environmentalImpactKnowledge"),
+                    diagnosticResponses.get("environmentalPolicies"),
+                    diagnosticResponses.get("performanceMeasures"),
+                    diagnosticResponses.get("riskAssessment")
+            );
+
+            Projeto projeto = new Projeto(description, location, estimatedBudget, plannedEnergyTypes, diagnosticoResponses);
+
+            projetoBo.cadastrarProjeto(projeto, userId);
 
             return Response.status(Response.Status.CREATED)
-                    .entity(Map.of("projectId", projectId))
+                    .entity(Map.of("message", "Projeto criado com sucesso!"))
                     .build();
+
         } catch (ValidationException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(Map.of("error", e.getMessage()))
                     .build();
-        } catch (UnauthorizedException e) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(Map.of("error", e.getMessage()))
-                    .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("error", "Erro inesperado ao cadastrar projeto."))
+                    .entity(Map.of("error", "Erro inesperado ao criar o projeto."))
                     .build();
         }
     }

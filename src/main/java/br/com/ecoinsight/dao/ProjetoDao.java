@@ -15,7 +15,7 @@ import java.util.List;
 
 class ProjetoDao implements IProjetoDao {
     private final Connection connection;
-    String tabela = "T_PROJETOS";
+    String tabela = "T_PROJETO";
     String tabela2 = "T_DIAGNOSTICO";
 
     ProjetoDao() {
@@ -24,36 +24,51 @@ class ProjetoDao implements IProjetoDao {
 
     @Override
     public int cadastrarProjeto(Projeto projeto, int userId) {
-        String sql = "INSERT INTO " + tabela + " (description, location, estimated_budget, planned_energy_types, " +
+        String sql = "INSERT INTO "+ tabela +" (description, location, estimated_budget, planned_energy_types, " +
                 "environmental_impact_knowledge, environmental_policies, performance_measures, risk_assessment, user_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"ID"})) {
+            System.out.println("Configurando parâmetros para o SQL...");
+
+            // Configurando os parâmetros no PreparedStatement
             stmt.setString(1, projeto.getDescription());
             stmt.setString(2, projeto.getLocation());
             stmt.setInt(3, projeto.getEstimatedBudget());
             stmt.setString(4, String.join(",", projeto.getPlannedEnergyTypes()));
+
             DiagnosticoResponses responses = projeto.getDiagnosticResponses();
             stmt.setInt(5, responses.getEnvironmentalImpactKnowledge());
             stmt.setInt(6, responses.getEnvironmentalPolicies());
             stmt.setInt(7, responses.getPerformanceMeasures());
             stmt.setInt(8, responses.getRiskAssessment());
             stmt.setInt(9, userId);
+
+            System.out.println("Executando a consulta...");
             stmt.executeUpdate();
+            System.out.println("Consulta executada com sucesso.");
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    int generatedId = rs.getInt(1); // Obtém o ID diretamente
+                    System.out.println("Projeto cadastrado com sucesso. ID gerado: " + generatedId);
+                    return generatedId;
+                } else {
+                    throw new DatabaseException("Nenhum ID foi gerado para o projeto.");
                 }
             }
-            throw new DatabaseException("Erro ao obter ID gerado para o projeto." +projeto);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DatabaseException("Erro ao cadastrar o projeto no banco de dados.", e);
         }
     }
 
+
+
     @Override
     public List<Projeto> listarProjetosPorUsuario(int userId) {
-        String sql = "SELECT id, description, location, estimated_budget, planned_energy_types " +
+        String sql = "SELECT id, description, location, estimated_budget, planned_energy_types, " +
+                "environmental_impact_knowledge, environmental_policies, performance_measures, risk_assessment " +
                 "FROM " + tabela + " WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -61,24 +76,34 @@ class ProjetoDao implements IProjetoDao {
 
             List<Projeto> projetos = new ArrayList<>();
             while (rs.next()) {
+                DiagnosticoResponses diagnostico = new DiagnosticoResponses(
+                        rs.getInt("environmental_impact_knowledge"),
+                        rs.getInt("environmental_policies"),
+                        rs.getInt("performance_measures"),
+                        rs.getInt("risk_assessment")
+                );
+
                 Projeto projeto = new Projeto(
-                        rs.getInt("id"),
                         rs.getString("description"),
                         rs.getString("location"),
                         rs.getInt("estimated_budget"),
-                        List.of(rs.getString("planned_energy_types").split(","))
+                        List.of(rs.getString("planned_energy_types").split(",")),
+                        diagnostico
                 );
+                projeto.setId(rs.getInt("id"));
                 projetos.add(projeto);
             }
 
             if (projetos.isEmpty()) {
                 throw new ResourceNotFoundException("Nenhum projeto encontrado para o usuário com ID " + userId);
             }
+
             return projetos;
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao listar projetos do usuário.", e);
         }
     }
+
 
     @Override
     public Projeto obterProjetoPorId(int projectId, int userId) {

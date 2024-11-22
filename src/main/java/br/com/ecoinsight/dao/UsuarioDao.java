@@ -20,16 +20,22 @@ class UsuarioDao implements IUsuarioDao {
 
     @Override
     public boolean cadastrarUsuario(Usuario usuario) {
-        String sql = "INSERT INTO " + tabela + " (nome, email, senha) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO "+ tabela +" (nome, email, senha) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            System.out.println("Executando SQL: " + sql);
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
             stmt.setString(3, usuario.getSenha());
-            return stmt.executeUpdate() > 0;
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Linhas afetadas: " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            throw new DatabaseException("Erro ao cadastrar o usuário.", e);
+            System.err.println("Erro no DAO ao executar SQL: " + e.getMessage());
+            e.printStackTrace();
+            throw new DatabaseException("Erro ao cadastrar o usuário no banco.", e);
         }
     }
+
 
     @Override
     public Usuario pesquisarUsuarioPorEmail(String email) {
@@ -53,16 +59,20 @@ class UsuarioDao implements IUsuarioDao {
     }
 
     public boolean salvarTokenRedefinicao(String email, String token) {
-        String sql = "UPDATE " + tabela + " SET reset_token = ?, token_expiration = SYSDATE + " +
-                "INTERVAL '1' HOUR WHERE email = ?";
+        String sql = "UPDATE " + tabela + " SET reset_token = ?, token_expiration = SYSDATE + INTERVAL '1' HOUR WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            System.out.println("Salvando token no banco: " + token + " para o email: " + email);
             stmt.setString(1, token);
             stmt.setString(2, email);
-            return stmt.executeUpdate() > 0;
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Linhas afetadas ao salvar token: " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
+            System.err.println("Erro ao salvar o token de redefinição: " + e.getMessage());
             throw new DatabaseException("Erro ao salvar o token de redefinição.", e);
         }
     }
+
 
     public boolean alterarSenha(String email, String novaSenha) {
         String sql = "UPDATE " + tabela + " SET senha = ?, reset_token = NULL, token_expiration = NULL WHERE email = ?";
@@ -76,8 +86,8 @@ class UsuarioDao implements IUsuarioDao {
     }
 
     public boolean validarToken(String email, String token) {
-        String sql = "SELECT reset_token FROM " + tabela + " WHERE email = ? AND reset_token = ? AND " +
-                "token_expiration > NOW()";
+        String sql = "SELECT reset_token FROM " + tabela + " WHERE email = ? AND reset_token = ? AND token_expiration > " +
+                "SYSDATE";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, token);
@@ -91,4 +101,5 @@ class UsuarioDao implements IUsuarioDao {
             throw new DatabaseException("Erro ao validar o token de redefinição.", e);
         }
     }
+
 }

@@ -12,23 +12,24 @@ public class Projeto {
     private List<String> plannedEnergyTypes;
     private DiagnosticoResponses diagnosticoResponses;
 
-    public Projeto(int id, String description, String location, int estimatedBudget, List<String> plannedEnergyTypes,
-                   DiagnosticoResponses diagnosticoResponses) {
-        this.setId(id);
+    public Projeto(String description, String location, int estimatedBudget, List<String> plannedEnergyTypes, DiagnosticoResponses diagnosticoResponses) {
         this.setDescription(description);
         this.setLocation(location);
         this.setEstimatedBudget(estimatedBudget);
         this.setPlannedEnergyTypes(plannedEnergyTypes);
+        this.setDiagnosticResponses(diagnosticoResponses);
+    }
+
+    public Projeto(int id, String description, String location, int estimatedBudget, List<String> plannedEnergyTypes,
+                   DiagnosticoResponses diagnosticoResponses) {
+        this.id = id;
+        this.description = description;
+        this.location = location;
+        this.estimatedBudget = estimatedBudget;
+        this.plannedEnergyTypes = plannedEnergyTypes;
         this.diagnosticoResponses = diagnosticoResponses;
     }
 
-    public Projeto(int id, String description, String location, int estimatedBudget, List<String> plannedEnergyTypes) {
-        setId(id);
-        setDescription(description);
-        setLocation(location);
-        setEstimatedBudget(estimatedBudget);
-        setPlannedEnergyTypes(plannedEnergyTypes);
-    }
 
     public int getId() {
         return id;
@@ -90,6 +91,9 @@ public class Projeto {
     }
 
     public void setDiagnosticResponses(DiagnosticoResponses diagnosticoResponses) {
+        if (diagnosticoResponses == null) {
+            throw new ValidationException("Respostas de diagnóstico não podem ser nulas.");
+        }
         this.diagnosticoResponses = diagnosticoResponses;
     }
 

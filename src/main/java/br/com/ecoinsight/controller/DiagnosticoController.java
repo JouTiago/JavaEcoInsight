@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
-@Path("/api/projects/{projectId}/diagnostic")
+@Path("/projects/{projectId}/diagnostic")
 public class DiagnosticoController {
     private final IDiagnosticoBo diagnosticBo = DiagnosticoBoFactory.criarDiagnosticBo();
 

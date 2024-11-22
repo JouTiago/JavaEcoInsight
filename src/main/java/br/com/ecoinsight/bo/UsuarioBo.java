@@ -13,7 +13,7 @@ class UsuarioBo implements IUsuarioBo {
     }
 
     @Override
-    public void solicitarAlteracaoSenha(String email) {
+    public String solicitarAlteracaoSenha(String email) {
         try {
             Usuario usuario = usuarioDao.pesquisarUsuarioPorEmail(email);
             if (usuario != null) {
@@ -21,7 +21,7 @@ class UsuarioBo implements IUsuarioBo {
                 boolean tokenSalvo = usuarioDao.salvarTokenRedefinicao(email, resetToken);
                 if (tokenSalvo) {
                     System.out.println("Link de redefinição: /reset-password?token=" + resetToken);
-                    return;
+                    return resetToken;
                 }
             }
             throw new ResourceNotFoundException("Usuário com o email " + email + " não encontrado.");
@@ -73,12 +73,17 @@ class UsuarioBo implements IUsuarioBo {
     @Override
     public void cadastrar(Usuario usuario) {
         try {
+            System.out.println("Validando e cadastrando usuário: " + usuario);
             if (!usuario.isSenhaForte(usuario.getSenha())) {
-                throw new ValidationException("A senha não é forte o suficiente. Certifique-se de que contém ao menos 8 caracteres, incluindo números e caracteres especiais.");
+                throw new ValidationException("Senha fraca.");
             }
             usuarioDao.cadastrarUsuario(usuario);
-        } catch (DatabaseException e) {
-            throw new InternalServerErrorException("Erro ao processar o cadastro do usuário.", e);
+            System.out.println("Usuário cadastrado com sucesso no DAO.");
+        } catch (Exception e) {
+            System.err.println("Erro em UsuarioBo.cadastrar: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
+
 }

@@ -11,12 +11,20 @@ import java.sql.SQLException;
 public class ConnectionFactory {
     private static volatile ConnectionFactory conexao;
     private static final String URL = "jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL";
-    private static final String USER = "RM555698";
-    private static final String PASSWORD = "fiap24";
+    private static final String USER = "RM556071";
+    private static final String PASSWORD = "090298";
 
     private ConnectionFactory() {}
 
+
+
     public static ConnectionFactory realizarConexao() {
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver JDBC do Oracle não encontrado.", e);
+        }
+
         if (conexao == null) {
             synchronized (ConnectionFactory.class) {
                 if (conexao == null) {
